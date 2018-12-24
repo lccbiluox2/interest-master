@@ -1,7 +1,7 @@
 <template>
   <div  id="mybody" >
     <div id="top" >
-      <div id="top_title"><input v-model='title' type="text" id="title"  ></div>
+      <div id="top_title"><input  type="text" id="mytitle"  ></div>
       <div id="top_add"><input  type="button" id="button" value="发表文章"  ></div>
       <div id="top_head"><img id="head_img" src="../../assets/blog/head.png" ></div>
     </div>
@@ -52,11 +52,9 @@
       },
       contentChanged(){
         var html = this.converter.makeHtml(this.content);
-        alert(html);
         var htmls = $.parseHTML( html );
         htmls = parseTable(htmls);
-        alert(htmls);
-        document.getElementById('show-content').innerHTML = html;
+        document.getElementById('show-content').innerHTML = htmls;
       }
     }
   }
@@ -64,56 +62,80 @@
   // 解析表格
   function parseTable( htmls) {
     var newHtml = "";
-    // $.each( htmls, function( i, el ) {
-    //   var nodeValue = el.innerText;
-    //   // 不是一个有效的行，空行
-    //   if(!nodeValue.undefined){
-    //     // 如果是表格
-    //     if(nodeValue.startsWith("|") && (nodeValue.indexOf("|--|") != -1) ){
-    //       // 分割表格按行读取
-    //       var tables = nodeValue.split("\n");
-    //       var newTable = "<table>";
-    //       alert(newTable);
-    //       var lineCount = 0;
-    //       // for(var j=0;i<tables.length;j++){
-    //       //   // var line = tables[j];
-    //       //   // if(!line.undefined){
-    //       //   //   if(lineCount == 0){
-    //       //   //     var reg = new RegExp("\\|","g"); //g,表示全部替换。
-    //       //   //     line = line.replace(reg,"</th><th>");
-    //       //   //     line = line.substring(5,line.length - 4);
-    //       //   //     line = "<tr>"+line+"</tr>";
-    //       //   //   }else  if(lineCount == 1){
-    //       //   //   }else {
-    //       //   //     var reg = new RegExp("\\|","g"); //g,表示全部替换。
-    //       //   //     line = line.replace(reg,"</td><td>");
-    //       //   //     line = line.substring(5,line.length - 4);
-    //       //   //     line = "<tr>"+line+"</tr>";
-    //       //   //   }
-    //       //   //   lineCount++;
-    //       //   //
-    //       //   //   newTable = newTable + line;
-    //       //   //   alert("newTable1"+newTable);
-    //       //   // }else {
-    //       //   //   break;
-    //       //   // }
-    //       // }
-    //
-    //       newTable = newTable +"</table>";
-    //       newHtml = newHtml+"<p>"+newTable+"</p>";
-    //
-    //       alert("newHtml"+newHtml);
-    //     }else {
-    //       // 如果不是表格数据加回去
-    //       newHtml = newHtml+"<p>"+nodeValue+"</p>";
-    //     }
-    //   }else {
-    //     newHtml = newHtml+"</br>";
-    //   }
-    //
-    // });
+
+    $.each( htmls, function( i, el ) {
+      if(el instanceof HTMLParagraphElement ) {
+        var nodeValue = el.innerHTML;
+        if (nodeValue == "") {
+          return true;
+        }
+
+        // 不是一个有效的行，空行
+        if (typeof (nodeValue) != "undefined") {
+          // 如果是表格
+          if (nodeValue.startsWith("|") && (nodeValue.indexOf("|--|") != -1)) {
+            // 分割表格按行读取
+            var tables = nodeValue.split("\n");
+            var newTable = "<table>";
+            var lineCount = 0;
+
+            for (var j = 0; i < tables.length; j++) {
+              lineCount++;
+              var line = tables[j];
+              // undefine是这么判断的
+              if (typeof (line) == "undefined") {
+                break;
+              }
+
+              if (lineCount == 1) {
+                var reg = new RegExp("\\|", "g"); //g,表示全部替换。
+                line = line.replace(reg, "</th><th>");
+                line = line.substring(5, line.length - 4);
+                line = "<tr>" + line + "</tr>";
+              } else if (lineCount == 2) {
+                continue;
+              } else {
+                var reg = new RegExp("\\|", "g"); //g,表示全部替换。
+                line = line.replace(reg, "</td><td>");
+                line = line.substring(5, line.length - 4);
+                line = "<tr>" + line + "</tr>";
+              }
+              newTable = newTable + line;
+
+            }
+            newTable = newTable + "</table>";
+            newHtml = newHtml + "<p>" + newTable + "</p>";
+          } else {
+            // 如果不是表格数据加回去
+            newHtml = newHtml + "<p>" + nodeValue + "</p>";
+          }
+        } else {
+          newHtml = newHtml + "</br>";
+        }
+      }else{
+        // 原生的html处理
+        newHtml = doHtml(el,newHtml)
+      }
+    });
     return newHtml;
   }
+
+
+  // 处理所有的html原生信息
+  function doHtml( el,newHtml) {
+    var nodeValue = el.outerHTML;
+    // if(el instanceof HTMLTableElement  ) {
+    //   var newTable = "<p><table>" + nodeValue + "</table></p>";
+    //   newHtml = newHtml + newTable;
+    // }
+
+    newHtml = newHtml + nodeValue;
+    return newHtml;
+  }
+
+
+
+
 </script>
 <style>
 
@@ -150,7 +172,7 @@
 
   }
 
-  #title{
+  #mytitle{
     float: left;
     width: 98%;
     height: 98%;
@@ -235,5 +257,34 @@
     verflow-x:hidden;
     overflow-y:auto;
   }
+
+
+  #show-content table {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+
+  }
+  #show-content table th{
+    padding: 8px 12px;
+    text-align: left;
+    color: #333;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+  }
+  #show-content table td{
+    padding: 8px 12px;
+    text-align: left;
+    color: #333;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+  }
+  #show-content table tr:nth-child(odd){
+    background:#F4F4F4;
+  }
+
+
 
 </style>

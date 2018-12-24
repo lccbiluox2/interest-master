@@ -29,7 +29,7 @@
 
 <script>
   export default {
-    name: '登录',
+    name: 'login',
     data() {
       return {
         logining : false,
@@ -64,7 +64,8 @@
       };
 
     }
-  }</script>
+  }
+</script>
 
 <style>
 
