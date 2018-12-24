@@ -1,29 +1,34 @@
 <template>
   <div  id="mybody" >
-    <div id="top" >
-      <div id="top_title"><input  type="text" id="mytitle"  ></div>
-      <div id="top_add"><input  type="button" id="button" value="发表文章"  ></div>
-      <div id="top_head"><img id="head_img" src="../../assets/blog/head.png" ></div>
-    </div>
-    <div id="menu">
-      <div class="item1"><a href="#" > &lt;博客 </a></div>
-      <div class="item1"><a href="#" > 撤回 </a></div>
-      <div class="item1"><a href="#" > 前进 </a></div>
-      <div class="item1"><a href="#" > B </a></div>
-      <div class="item1"><a href="#" > I </a></div>
-      <div class="item1"><a href="#" > H </a></div>
-      <div class="item1"><a href="#" > &lt; &gt; </a></div>
-      <div class="item1"><a href="#" > TABLE </a></div>
-      <div class="item1"><a href="#" > URL </a></div>
-      <div class="item1"><a href="#" > IMG </a></div>
-    </div>
-    <div id="content_div" >
-      <!-- textarea之间不要有空格 -->
-      <textarea v-model='content' id="content_text" ></textarea>
-    </div>
-    <div  id="show_div"   >
-      <div id="show-content"   ></div>
-    </div>
+
+    <form @submit.prevent="submit" id="myform">
+      <div id="top">
+        <div id="top_title"><input type="text" id="mytitle"></div>
+        <div id="top_add"><input type="submit" id="button" value="发表文章"></div>
+        <div id="top_head"><img id="head_img" src="../../assets/blog/head.png"></div>
+      </div>
+      <div id="menu">
+        <div class="item1"><a href="#"> &lt;博客 </a></div>
+        <div class="item1"><a href="#"> 撤回 </a></div>
+        <div class="item1"><a href="#"> 前进 </a></div>
+        <div class="item1"><a href="#"> B </a></div>
+        <div class="item1"><a href="#"> I </a></div>
+        <div class="item1"><a href="#"> H </a></div>
+        <div class="item1"><a href="#"> &lt; &gt; </a></div>
+        <div class="item1"><a href="#"> TABLE </a></div>
+        <div class="item1"><a href="#"> URL </a></div>
+        <div class="item1"><a href="#"> IMG </a></div>
+      </div>
+      <div id="content_div">
+        <!-- textarea之间不要有空格 -->
+        <textarea v-model='content' id="content_text"></textarea>
+      </div>
+      <div id="show_div">
+        <input type="text" id="form_content" hidden="true" >
+        <div id="show-content"></div>
+      </div>
+    </form>
+
   </div>
 </template>
 
@@ -55,6 +60,7 @@
         var htmls = $.parseHTML( html );
         htmls = parseTable(htmls);
         document.getElementById('show-content').innerHTML = htmls;
+        $("#form_content").val(htmls) ;
       }
     }
   }
@@ -147,6 +153,11 @@
     float:left;
     height:1000px;
     width:1200px;
+  }
+  #myform{
+    float: left;
+    width:100%;
+    height: 100%;
   }
   #top{
     float: left;
